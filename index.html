@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="A simple, fast tap counter that remembers where you left off.">
+  <meta name="theme-color" content="#0a1230">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tick">
+  <title>Tick</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="bar">
+    <h1 class="title"><img src="favicon.svg" width="32" height="32" alt="">Tick</h1>
+    <button id="settings" class="icon-btn" type="button" aria-label="Settings" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+        <path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <circle cx="16" cy="7" r="2.25" stroke="currentColor" stroke-width="2" fill="none"/>
+        <circle cx="8" cy="17" r="2.25" stroke="currentColor" stroke-width="2" fill="none"/>
+      </svg>
+    </button>
+  </header>
+
+  <main id="stage" class="stage">
+    <!-- The whole stage is one big tap target. -->
+    <button id="tap" class="tap" type="button" aria-label="Count up" aria-keyshortcuts="Space Enter"></button>
+    <div id="dial" class="dial">
+      <output id="count" class="count" aria-live="polite" aria-atomic="true">0</output>
+    </div>
+    <p id="hint" class="hint" aria-hidden="true">Tap anywhere to count</p>
+  </main>
+
+  <footer class="bar">
+    <p id="status" class="status">Counting up · No limit</p>
+    <button id="reset" class="pill" type="button" aria-keyshortcuts="R">Reset</button>
+  </footer>
+
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <form method="dialog">
+      <h2 id="settings-title">Settings</h2>
+
+      <fieldset class="field">
+        <legend>Each tap</legend>
+        <div class="seg">
+          <label><input type="radio" name="dir" value="1"><span>Counts up (+1)</span></label>
+          <label><input type="radio" name="dir" value="-1"><span>Counts down (−1)</span></label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="limit-input" id="limit-label">Limit</label>
+        <input id="limit-input" type="number" inputmode="numeric" min="1" max="999999999" step="1" placeholder="No limit" autocomplete="off">
+        <p class="field-hint" id="limit-hint">Counting stops at this number. Leave empty for no limit.</p>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="pill pill--ghost" type="button" value="cancel" id="settings-cancel">Cancel</button>
+        <button class="pill pill--solid" value="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
