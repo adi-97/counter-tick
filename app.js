@@ -15,29 +15,86 @@
   const limitLabel = $('limit-label');
   const limitHint = $('limit-hint');
   const dirInputs = dialog.querySelectorAll('input[name="dir"]');
+  const soundBtn = $('sound');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 
   let count = 0;
   let limit = null;
   let dir = 1;
+  let sound = false;
 
   function load() {
     count = 0;
     limit = null;
     dir = 1;
+    sound = false;
     try {
       const saved = JSON.parse(localStorage.getItem(KEY));
       if (saved && Number.isInteger(saved.count)) count = saved.count;
       if (saved && Number.isInteger(saved.limit) && saved.limit > 0) limit = saved.limit;
       if (saved && saved.dir === -1) dir = -1;
+      if (saved && saved.sound === true) sound = true;
     } catch {}
     clamp();
   }
 
   function save() {
     try {
-      localStorage.setItem(KEY, JSON.stringify({ count, limit, dir }));
+      localStorage.setItem(KEY, JSON.stringify({ count, limit, dir, sound }));
     } catch {}
+  }
+
+  let audio = null;
+  let speakingSince = 0;
+  let pending = null;
+
+  function click() {
+    if (!sound) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    audio = audio || new AC();
+    if (audio.state === 'suspended') audio.resume();
+    const t = audio.currentTime;
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(1400, t);
+    osc.frequency.exponentialRampToValueAtTime(700, t + 0.04);
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    osc.connect(gain).connect(audio.destination);
+    osc.start(t);
+    osc.stop(t + 0.06);
+  }
+
+  function say(text) {
+    speakingSince = performance.now();
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.rate = 1.6;
+    u.onend = u.onerror = () => {
+      speakingSince = 0;
+      if (pending !== null) {
+        const next = pending;
+        pending = null;
+        say(next);
+      }
+    };
+    speechSynthesis.speak(u);
+  }
+
+  function stopSpeech() {
+    pending = null;
+    speakingSince = 0;
+    if (canSpeak) speechSynthesis.cancel();
+  }
+
+  function speak(text, { interrupt = false } = {}) {
+    if (!sound || !canSpeak) return;
+    const stuck = speakingSince && performance.now() - speakingSince > 2500;
+    if (interrupt || stuck) stopSpeech();
+    else if (speakingSince) { pending = text; return; }
+    say(text);
   }
 
   function clamp() {
@@ -60,6 +117,7 @@
       ? 'Set a start number in Settings'
       : `Tap anywhere to count ${dir > 0 ? 'up' : 'down'}`;
     tapBtn.setAttribute('aria-label', dir > 0 ? 'Count up' : 'Count down');
+    soundBtn.setAttribute('aria-pressed', sound);
 
     if (finished) statusEl.textContent = dir > 0 ? 'Limit reached! 🎉' : 'Countdown complete! 🎉';
     else if (dir > 0) statusEl.textContent = `Counting up · ${limit === null ? 'No limit' : `Limit ${limit}`}`;
@@ -235,8 +293,22 @@
     save();
     render();
     ripple(e);
-    if (done()) celebrate();
-    else pop(delta);
+    click();
+    if (done()) {
+      speak(`${count}. ${dir > 0 ? 'Limit reached!' : 'Done!'}`, { interrupt: true });
+      celebrate();
+    } else {
+      speak(count);
+      pop(delta);
+    }
+  }
+
+  function toggleSound() {
+    sound = !sound;
+    save();
+    render();
+    if (sound) speak('Sound on', { interrupt: true });
+    else stopSpeech();
   }
 
   function reset() {
@@ -249,6 +321,8 @@
 
   tapBtn.addEventListener('click', (e) => step(dir, e));
   $('reset').addEventListener('click', reset);
+  soundBtn.hidden = !canSpeak;
+  soundBtn.addEventListener('click', toggleSound);
 
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey || e.altKey || dialog.open) return;
@@ -260,6 +334,7 @@
       case '+': case '=': case 'ArrowUp': step(1); break;
       case '-': case '_': case 'ArrowDown': step(-1); break;
       case 'r': case 'R': reset(); break;
+      case 's': case 'S': if (canSpeak) toggleSound(); break;
       default: return;
     }
     e.preventDefault();

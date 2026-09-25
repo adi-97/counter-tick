@@ -78,6 +78,18 @@ button {
   letter-spacing: 0.02em;
 }
 
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn[hidden] { display: none; }
+
+.icon-btn[aria-pressed="true"] .off,
+.icon-btn[aria-pressed="false"] .on { display: none; }
+
+.icon-btn[aria-pressed="false"] { color: var(--muted); }
+
 .title img {
   display: block;
   border-radius: 8px;

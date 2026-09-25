@@ -17,13 +17,25 @@
 <body>
   <header class="bar">
     <h1 class="title"><img src="favicon.svg" width="32" height="32" alt="">Tick</h1>
-    <button id="settings" class="icon-btn" type="button" aria-label="Settings" aria-haspopup="dialog">
-      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
-        <path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-        <circle cx="16" cy="7" r="2.25" stroke="currentColor" stroke-width="2" fill="none"/>
-        <circle cx="8" cy="17" r="2.25" stroke="currentColor" stroke-width="2" fill="none"/>
-      </svg>
-    </button>
+    <div class="actions">
+      <button id="sound" class="icon-btn" type="button" aria-label="Speak numbers" aria-pressed="false" aria-keyshortcuts="S" hidden>
+        <svg class="on" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+          <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/>
+          <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <svg class="off" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+          <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/>
+          <path d="M16 9.5l5 5M21 9.5l-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+      </button>
+      <button id="settings" class="icon-btn" type="button" aria-label="Settings" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+          <path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="16" cy="7" r="2.25" stroke="currentColor" stroke-width="2" fill="none"/>
+          <circle cx="8" cy="17" r="2.25" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <main id="stage" class="stage">
