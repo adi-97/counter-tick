@@ -1,4 +1,4 @@
-# Tick
+# T±ck
 
 A tiny, fast, mobile-first tap counter. Plain HTML, CSS and a small vanilla JS file. No build step, no dependencies, no backend.
 
